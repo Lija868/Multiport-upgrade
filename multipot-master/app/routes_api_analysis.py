@@ -120,12 +120,7 @@ def analysis_index():
     data_requests_last_24h_count = requests_last_24h_count()
     data_distinct_ip_count = distinct_ip_addresses_count()
     data_distinct_data_ips_last_24h_count = distinct_ip_addresses_last_24h_count()
-    data_wp_password_tries_count = wordpress_wp_login_password_tries_count() + wordpress_xmlrpc_password_tries_count()
-    data_wp_password_tries_last_24h_count = (
-        wordpress_wp_login_password_tries_last_24h_count() + wordpress_xmlrpc_password_tries_last_24h_count()
-    )
-    data_drupal8_password_tries_count = drupal_password_tries_count()
-    data_drupal8_password_tries_last_24h_count = drupal_password_tries_last_24h_count()
+
     # row 3
     data_url_path_top = paths_top(10)
     data_endpoints_top = endpoints_top(10)
@@ -136,13 +131,9 @@ def analysis_index():
         data_endpoints_top=data_endpoints_top,
         data_url_path_top=data_url_path_top,
         data_distinct_ip_count=data_distinct_ip_count,
-        data_wp_password_tries_count=data_wp_password_tries_count,
-        data_wp_password_tries_last_24h_count=data_wp_password_tries_last_24h_count,
         utc_time_now=datetime.utcnow(),
         data_requests_last_24h_count=data_requests_last_24h_count,
         data_distinct_data_ips_last_24h_count=data_distinct_data_ips_last_24h_count,
-        data_drupal8_password_tries_count=data_drupal8_password_tries_count,
-        data_drupal8_password_tries_last_24h_count=data_drupal8_password_tries_last_24h_count,
     )
 
 

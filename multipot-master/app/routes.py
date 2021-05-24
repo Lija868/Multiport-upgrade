@@ -7,7 +7,6 @@ from app.helpers import save_request, save_response
 
 ### --- Routes of the honeypot websites --- ###
 
-# Drupal 7
 @app.route("/", methods=["GET", "POST"])
 def index():
     return send_from_directory("static/fake-sites/web/", "index.html")
@@ -29,7 +28,6 @@ def status():
     return jsonify(d)
 
 
-# Catch all, for routes not otherwise covered --> Drupal 7
 @app.route("/", defaults={"path": ""}, methods=["GET", "POST"])
 @app.route("/<path:anypath>", methods=["GET", "POST"])
 def catch_all(anypath):

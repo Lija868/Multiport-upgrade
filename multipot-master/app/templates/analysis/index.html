@@ -44,32 +44,15 @@
                 </div>
             </div>
 
-<!--            <div class="col-xs-12 col-md-6 col-lg-6 col-xl-3">-->
-<!--                <div class="card-box noradius noborder bg-danger">-->
-<!--                    <i class="fas fa-exclamation-triangle fa-6x float-right text-white"></i>-->
-<!--                    <h6 class="text-white text-uppercase m-b-20">WordPress pwd guesses</h6>-->
-<!--                    <h1 class="m-b-20 text-white counter">{{ data_wp_password_tries_count }}</h1>-->
-<!--                    <span class="text-white">{{ data_wp_password_tries_last_24h_count }} (last 24 hours)</span>-->
-<!--                </div>-->
-<!--            </div>-->
-
-<!--            <div class="col-xs-12 col-md-6 col-lg-6 col-xl-3">-->
-<!--                <div class="card-box noradius noborder bg-danger">-->
-<!--                    <i class="fas fa-exclamation-triangle fa-6x float-right text-white"></i>-->
-<!--                    <h6 class="text-white text-uppercase m-b-20">Drupal pwd guesses</h6>-->
-<!--                    <h1 class="m-b-20 text-white counter">{{ data_drupal8_password_tries_count }}</h1>-->
-<!--                    <span class="text-white">{{ data_drupal8_password_tries_last_24h_count }} (last 24 hours)</span>-->
-<!--                </div>-->
-<!--            </div>-->
             <script>
                 $(document).ready(function() {
                         var url_string = window.location.href;
                         var url = new URL(url_string);
-<!--                        if (url.searchParams.get("token") === "verysecret") {-->
-<!--                            console.log("muh");-->
-<!--                            var t = '<div class="alert alert-danger alert-dismissible">Please change your token in the <code>config.py</code> file! Keeping it on default (<code>verysecret</code>) will endanger your honeypot installation.<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a></div>';-->
-<!--                            document.getElementById("alertDiv").innerHTML = t;-->
-<!--                        }-->
+                        if (url.searchParams.get("token") === "verysecret") {
+                            console.log("muh");
+                            var t = '<div class="alert alert-danger alert-dismissible">Please change your token in the <code>config.py</code> file! Keeping it on default (<code>verysecret</code>) will endanger your honeypot installation.<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a></div>';
+                            document.getElementById("alertDiv").innerHTML = t;
+                        }
 
                    });
             </script>
