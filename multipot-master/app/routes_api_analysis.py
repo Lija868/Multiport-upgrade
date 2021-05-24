@@ -8,91 +8,111 @@ import ipaddress
 
 # Returns an excerpt of all stored request/response pairs
 # not used
-@app.route('/api/analysis/data')
+@app.route("/api/analysis/data")
 @token_required
 def api_analysis_data():
     # omits rows when response or request is missing
-    data = {"data": [{'uuid': req.uuid,
-             'request': {'id': req.id, 'url': req.url, 'timestamp': req.timestamp, 'method': req.method,
-                         'remote_addr': req.remote_addr},
-             'response': {'status': resp.status, 'headers': resp.headers}}
+    data = {
+        "data": [
+            {
+                "uuid": req.uuid,
+                "request": {
+                    "id": req.id,
+                    "url": req.url,
+                    "timestamp": req.timestamp,
+                    "method": req.method,
+                    "remote_addr": req.remote_addr,
+                },
+                "response": {"status": resp.status, "headers": resp.headers},
+            }
             for req in models.Request.query.all()
-            for resp in models.Response.query.filter_by(request_uuid=req.uuid).all()]}
+            for resp in models.Response.query.filter_by(request_uuid=req.uuid).all()
+        ]
+    }
     return jsonify(data)
 
 
-@app.route('/api/analysis/<uuid:uuid>', methods=['GET', 'DELETE'])
+@app.route("/api/analysis/<uuid:uuid>", methods=["GET", "DELETE"])
 @token_required
 def api_analysis_data_uuid(uuid):
     uuid = str(uuid)
-    if request.method == 'GET':
+    if request.method == "GET":
         req = models.Request.query.filter_by(uuid=uuid).first()
         resp = models.Response.query.filter_by(request_uuid=uuid).first()
         if req and resp:
-            data = {'request': req.todict(), 'response': resp.todict()}
+            data = {"request": req.todict(), "response": resp.todict()}
             return jsonify(data)
         else:
-            return jsonify({'message': 'No such UUID'}), 404
-    if request.method == 'DELETE':
+            return jsonify({"message": "No such UUID"}), 404
+    if request.method == "DELETE":
         req = models.Request.query.filter_by(uuid=uuid).first()
         resp = models.Response.query.filter_by(request_uuid=uuid).first()
         if req and resp:
             db.session.delete(req)
             db.session.delete(resp)
             db.session.commit()
-            return jsonify({'message': 'Delete success'})
+            return jsonify({"message": "Delete success"})
         else:
-            return jsonify({'message': 'No such UUID'}), 404
+            return jsonify({"message": "No such UUID"}), 404
 
 
 # not used
-@app.route('/api/analysis/ip/<ip>')
+@app.route("/api/analysis/ip/<ip>")
 @token_required
 def api_analysis_ip(ip):
     try:
         ipaddress.ip_address(ip)
     except ValueError:
-        return jsonify({'message': 'Not a valid IP address'}), 404
-    data = [{'uuid': req.uuid,
-             'request': {'id': req.id, 'url': req.url, 'timestamp': req.timestamp, 'method': req.method,
-                         'remote_addr': req.remote_addr}}
-            for req in models.Request.query.filter_by(remote_addr=ip).all()]
+        return jsonify({"message": "Not a valid IP address"}), 404
+    data = [
+        {
+            "uuid": req.uuid,
+            "request": {
+                "id": req.id,
+                "url": req.url,
+                "timestamp": req.timestamp,
+                "method": req.method,
+                "remote_addr": req.remote_addr,
+            },
+        }
+        for req in models.Request.query.filter_by(remote_addr=ip).all()
+    ]
     return jsonify(data)
 
 
-@app.route('/api/analysis/ip/geoinfo/<ip>')
+@app.route("/api/analysis/ip/geoinfo/<ip>")
 @token_required
 def api_geoinfo_ip(ip):
     try:
         ipaddress.ip_address(ip)
     except ValueError:
-        return jsonify({'message': 'Not a valid IP address'}), 404
+        return jsonify({"message": "Not a valid IP address"}), 404
     geo_whois = gather_ip_geo_whois(ip)
     return jsonify(geo_whois)
 
 
-@app.route('/api/analysis/chart/requests/days/<int:days>', methods=['GET'])
+@app.route("/api/analysis/chart/requests/days/<int:days>", methods=["GET"])
 @token_required
 def api_analysis_chart_requests_last_x_days(days):
     requests_chart_last_x_days_days, requests_chart_last_x_days_requests = requests_last_x_days_chart(days)
-    return jsonify({'days': requests_chart_last_x_days_days, 'requests': requests_chart_last_x_days_requests})
+    return jsonify({"days": requests_chart_last_x_days_days, "requests": requests_chart_last_x_days_requests})
 
 
-@app.route('/api/analysis/chart/requests/hours/<int:hours>', methods=['GET'])
+@app.route("/api/analysis/chart/requests/hours/<int:hours>", methods=["GET"])
 @token_required
 def api_analysis_chart_requests_last_x_hours(hours):
     requests_chart_last_x_days_hours, requests_chart_last_x_hours_requests = requests_last_x_hours_chart(hours)
-    return jsonify({'hours': requests_chart_last_x_days_hours, 'requests': requests_chart_last_x_hours_requests})
+    return jsonify({"hours": requests_chart_last_x_days_hours, "requests": requests_chart_last_x_hours_requests})
 
 
-@app.route('/api/analysis/table/top-ips/<int:top>/days/<int:days>', methods=['GET'])
+@app.route("/api/analysis/table/top-ips/<int:top>/days/<int:days>", methods=["GET"])
 @token_required
 def api_analysis_table_ip_addresses_top(top, days):
     data_top_ip = ip_addresses_top(top, days)
     return jsonify(data_top_ip)
 
 
-@app.route('/analysis/index')
+@app.route("/analysis/index")
 @token_required
 def analysis_index():
     # row 1
@@ -101,51 +121,82 @@ def analysis_index():
     data_distinct_ip_count = distinct_ip_addresses_count()
     data_distinct_data_ips_last_24h_count = distinct_ip_addresses_last_24h_count()
     data_wp_password_tries_count = wordpress_wp_login_password_tries_count() + wordpress_xmlrpc_password_tries_count()
-    data_wp_password_tries_last_24h_count = wordpress_wp_login_password_tries_last_24h_count() + wordpress_xmlrpc_password_tries_last_24h_count()
+    data_wp_password_tries_last_24h_count = (
+        wordpress_wp_login_password_tries_last_24h_count() + wordpress_xmlrpc_password_tries_last_24h_count()
+    )
     data_drupal8_password_tries_count = drupal_password_tries_count()
     data_drupal8_password_tries_last_24h_count = drupal_password_tries_last_24h_count()
     # row 3
     data_url_path_top = paths_top(10)
     data_endpoints_top = endpoints_top(10)
-    return render_template('analysis/index.html', ANALYSIS_TOKEN=Config.ANALYSIS_TOKEN,
-                           data_stored_requests_count=data_stored_requests_count, data_endpoints_top=data_endpoints_top,
-                           data_url_path_top=data_url_path_top, data_distinct_ip_count=data_distinct_ip_count,
-                           data_wp_password_tries_count=data_wp_password_tries_count, data_wp_password_tries_last_24h_count=data_wp_password_tries_last_24h_count,
-                           utc_time_now=datetime.utcnow(), data_requests_last_24h_count=data_requests_last_24h_count,
-                           data_distinct_data_ips_last_24h_count=data_distinct_data_ips_last_24h_count,
-                           data_drupal8_password_tries_count=data_drupal8_password_tries_count,
-                           data_drupal8_password_tries_last_24h_count=data_drupal8_password_tries_last_24h_count
-                           )
+    return render_template(
+        "analysis/index.html",
+        ANALYSIS_TOKEN=Config.ANALYSIS_TOKEN,
+        data_stored_requests_count=data_stored_requests_count,
+        data_endpoints_top=data_endpoints_top,
+        data_url_path_top=data_url_path_top,
+        data_distinct_ip_count=data_distinct_ip_count,
+        data_wp_password_tries_count=data_wp_password_tries_count,
+        data_wp_password_tries_last_24h_count=data_wp_password_tries_last_24h_count,
+        utc_time_now=datetime.utcnow(),
+        data_requests_last_24h_count=data_requests_last_24h_count,
+        data_distinct_data_ips_last_24h_count=data_distinct_data_ips_last_24h_count,
+        data_drupal8_password_tries_count=data_drupal8_password_tries_count,
+        data_drupal8_password_tries_last_24h_count=data_drupal8_password_tries_last_24h_count,
+    )
 
 
-@app.route('/analysis/details')
+@app.route("/analysis/details")
 @token_required
 def analysis_details():
     query = models.Request.query.order_by(desc(models.Request.id)).all()
-    data = [{'uuid': req.uuid,
-             'request': {'id': req.id, 'url': req.url, 'timestamp': req.timestamp, 'method': req.method,
-                         'remote_addr': req.remote_addr}}
-            for req in query]
-    return render_template('analysis/details.html', table_content=data, ANALYSIS_TOKEN=Config.ANALYSIS_TOKEN)
+    data = [
+        {
+            "uuid": req.uuid,
+            "request": {
+                "id": req.id,
+                "url": req.url,
+                "timestamp": req.timestamp,
+                "method": req.method,
+                "remote_addr": req.remote_addr,
+            },
+        }
+        for req in query
+    ]
+    return render_template("analysis/details.html", table_content=data, ANALYSIS_TOKEN=Config.ANALYSIS_TOKEN)
 
 
-
-@app.route('/analysis/ip')
+@app.route("/analysis/ip")
 @token_required
 def analysis_ip():
-    ip = request.args.get('ip')
+    ip = request.args.get("ip")
     try:
         if ip is None:
             raise ValueError("No IP received.")
         ipaddress.ip_address(ip)
     except ValueError:
-        return render_template('analysis/ip.html', ANALYSIS_TOKEN=Config.ANALYSIS_TOKEN, IP="")
-    data_table = [{'uuid': req.uuid,
-                  'request': {'id': req.id, 'url': req.url, 'timestamp': req.timestamp, 'method': req.method,
-                              'remote_addr': req.remote_addr}}
-                 for req in models.Request.query.filter_by(remote_addr=ip).all()]
+        return render_template("analysis/ip.html", ANALYSIS_TOKEN=Config.ANALYSIS_TOKEN, IP="")
+    data_table = [
+        {
+            "uuid": req.uuid,
+            "request": {
+                "id": req.id,
+                "url": req.url,
+                "timestamp": req.timestamp,
+                "method": req.method,
+                "remote_addr": req.remote_addr,
+            },
+        }
+        for req in models.Request.query.filter_by(remote_addr=ip).all()
+    ]
     geo_whois = gather_ip_geo_whois(ip)
     bar_days, bar_requests = requests_all_days_chart(ip)
-    return render_template('analysis/ip.html', ANALYSIS_TOKEN=Config.ANALYSIS_TOKEN, table_content=data_table, IP=ip, geo_whois=geo_whois, bar_days=bar_days, bar_requests=bar_requests)
-
-
+    return render_template(
+        "analysis/ip.html",
+        ANALYSIS_TOKEN=Config.ANALYSIS_TOKEN,
+        table_content=data_table,
+        IP=ip,
+        geo_whois=geo_whois,
+        bar_days=bar_days,
+        bar_requests=bar_requests,
+    )

@@ -8,27 +8,32 @@ from app.helpers import save_request, save_response
 ### --- Routes of the honeypot websites --- ###
 
 # Drupal 7
-@app.route('/', methods=['GET', 'POST'])
+@app.route("/", methods=["GET", "POST"])
 def index():
-    return send_from_directory('static/fake-sites/web/', 'index.html')
-
-
+    return send_from_directory("static/fake-sites/web/", "index.html")
 
 
 # Owncloud status page
-@app.route('/stat')
-@app.route('/status')
+@app.route("/stat")
+@app.route("/status")
 def status():
-    d = {"installed": True, "maintenance": True, "needsDbUpgrade": True, "version": "8.1.7.2", "versionstring": "8.1.7",
-         "edition": "Community", "productname": "Secure Cloud"}
+    d = {
+        "installed": True,
+        "maintenance": True,
+        "needsDbUpgrade": True,
+        "version": "8.1.7.2",
+        "versionstring": "8.1.7",
+        "edition": "Community",
+        "productname": "Secure Cloud",
+    }
     return jsonify(d)
 
 
 # Catch all, for routes not otherwise covered --> Drupal 7
-@app.route('/', defaults={'path': ''}, methods=['GET', 'POST'])
-@app.route('/<path:anypath>', methods=['GET', 'POST'])
+@app.route("/", defaults={"path": ""}, methods=["GET", "POST"])
+@app.route("/<path:anypath>", methods=["GET", "POST"])
 def catch_all(anypath):
-    return send_from_directory('static/fake-sites/web/', 'index.html')
+    return send_from_directory("static/fake-sites/web/", "index.html")
 
 
 @app.before_request

@@ -3,6 +3,7 @@ from sqlalchemy import desc, func, or_
 from collections import Counter
 from urllib.parse import urlparse
 from datetime import datetime, timedelta
+
 # from defusedxml.ElementTree import fromstring
 import requests
 
@@ -14,38 +15,50 @@ import requests
 def ip_addresses_top(x, days):
     # 0 = all time
     if days == 0:
-        data_top_ip = [{'remote_addr': q.remote_addr, 'qty': q.qty}
-                       for q in
-                       db.session.query(func.count(models.Request.remote_addr).label('qty'), models.Request.remote_addr
-                                        ).group_by(models.Request.remote_addr).order_by(desc('qty')).limit(x)]
+        data_top_ip = [
+            {"remote_addr": q.remote_addr, "qty": q.qty}
+            for q in db.session.query(func.count(models.Request.remote_addr).label("qty"), models.Request.remote_addr)
+            .group_by(models.Request.remote_addr)
+            .order_by(desc("qty"))
+            .limit(x)
+        ]
         return data_top_ip
     else:
-        data_top_ip = [{'remote_addr': q.remote_addr, 'qty': q.qty}
-                       for q in
-                       db.session.query(func.count(models.Request.remote_addr).label('qty'), models.Request.remote_addr
-                                        ).filter(models.Request.timestamp > (datetime.utcnow() - timedelta(days=days))
-                                                 ).group_by(models.Request.remote_addr).order_by(desc('qty')).limit(x)]
+        data_top_ip = [
+            {"remote_addr": q.remote_addr, "qty": q.qty}
+            for q in db.session.query(func.count(models.Request.remote_addr).label("qty"), models.Request.remote_addr)
+            .filter(models.Request.timestamp > (datetime.utcnow() - timedelta(days=days)))
+            .group_by(models.Request.remote_addr)
+            .order_by(desc("qty"))
+            .limit(x)
+        ]
         return data_top_ip
 
 
 def wordpress_wp_login_usernames_password_tries_top(x):
-    data_form = db.session.query(models.Request.form).filter_by(endpoint='wp_login', method='POST').all()
-    data_usernames = [i[0]['log'] for i in data_form]
-    data_pwds = [i[0]['pwd'] for i in data_form]
+    data_form = db.session.query(models.Request.form).filter_by(endpoint="wp_login", method="POST").all()
+    data_usernames = [i[0]["log"] for i in data_form]
+    data_pwds = [i[0]["pwd"] for i in data_form]
     data_usernames_tries_counted = Counter(data_usernames).most_common(x)
     data_pwds_tries_counted = Counter(data_pwds).most_common(x)
     return data_usernames_tries_counted, data_pwds_tries_counted
 
 
 def wordpress_wp_login_password_tries_count():
-    data_count = db.session.query(models.Request.form).filter_by(endpoint='wp_login', method='POST').count()
+    data_count = db.session.query(models.Request.form).filter_by(endpoint="wp_login", method="POST").count()
     return data_count
 
 
 def wordpress_wp_login_password_tries_last_24h_count():
-    data_count = db.session.query(models.Request).filter(
-        models.Request.timestamp > (datetime.utcnow() - timedelta(days=1)), models.Request.endpoint == 'wp_login',
-        models.Request.method == 'POST').count()
+    data_count = (
+        db.session.query(models.Request)
+        .filter(
+            models.Request.timestamp > (datetime.utcnow() - timedelta(days=1)),
+            models.Request.endpoint == "wp_login",
+            models.Request.method == "POST",
+        )
+        .count()
+    )
     return data_count
 
 
@@ -73,27 +86,41 @@ def distinct_ip_addresses_count():
 
 
 def distinct_ip_addresses_last_24h_count():
-    data_distinct_ip_last_24h = db.session.query(models.Request.remote_addr).filter(
-        models.Request.timestamp > (datetime.utcnow() - timedelta(days=1))).distinct().count()
+    data_distinct_ip_last_24h = (
+        db.session.query(models.Request.remote_addr)
+        .filter(models.Request.timestamp > (datetime.utcnow() - timedelta(days=1)))
+        .distinct()
+        .count()
+    )
     return data_distinct_ip_last_24h
 
 
 def requests_last_24h_count():
-    data_requests_last_24h_count = db.session.query(models.Request).filter(
-        models.Request.timestamp > (datetime.utcnow() - timedelta(days=1))).count()
+    data_requests_last_24h_count = (
+        db.session.query(models.Request)
+        .filter(models.Request.timestamp > (datetime.utcnow() - timedelta(days=1)))
+        .count()
+    )
     return data_requests_last_24h_count
 
 
 def requests_last_x_hours_chart(x):
     if int(x) > 24:
         return [], []
-    requests_last_24h = db.session.query(models.Request).filter(
-        models.Request.timestamp > (datetime.utcnow() - timedelta(hours=x))).all()
+    requests_last_24h = (
+        db.session.query(models.Request)
+        .filter(models.Request.timestamp > (datetime.utcnow() - timedelta(hours=x)))
+        .all()
+    )
     dates = [h.timestamp.replace(microsecond=0, second=0, minute=0) for h in requests_last_24h]
     dates_counted = list(Counter(dates).items())
     dates_counted = sorted(dates_counted)
     # drop requests from previous hour, e.g. 4h back:  17:15 -> 13:15 (but we want till 13:00). So we go back to 12:15 and then drop all requests from 12:**, and check that it is the same day
-    if ((len(dates_counted) != 0) and (dates_counted[0][0].hour == (datetime.utcnow() - timedelta(hours=x)).hour) and (dates_counted[0][0].day == (datetime.utcnow() - timedelta(hours=x)).day)):
+    if (
+        (len(dates_counted) != 0)
+        and (dates_counted[0][0].hour == (datetime.utcnow() - timedelta(hours=x)).hour)
+        and (dates_counted[0][0].day == (datetime.utcnow() - timedelta(hours=x)).day)
+    ):
         dates_counted.pop(0)
     # create list with all hours, to fill hours with zero requests
     hour_list = []
@@ -110,8 +137,11 @@ def requests_last_x_hours_chart(x):
 
 # todo: works, however, leaves out days where 0 requests were recorded
 def requests_last_x_days_chart(x):
-    requests_last_x_days = db.session.query(models.Request).filter(
-        models.Request.timestamp > (datetime.utcnow().date() - timedelta(days=x-1))).all()
+    requests_last_x_days = (
+        db.session.query(models.Request)
+        .filter(models.Request.timestamp > (datetime.utcnow().date() - timedelta(days=x - 1)))
+        .all()
+    )
     days = [h.timestamp.date() for h in requests_last_x_days]
     days_counted = list(Counter(days).items())
     days_counted_sorted = sorted(days_counted, key=lambda day: day)
@@ -149,7 +179,7 @@ def wordpress_xmlrcp_username_password_tries_top(x):
 def wordpress_xmlrpc_username_password_tries_top(x):
     usernames = []
     passwords = []
-    data_form = db.session.query(models.Request.form).filter_by(endpoint='wp_xmlrpc', method='POST').all()
+    data_form = db.session.query(models.Request.form).filter_by(endpoint="wp_xmlrpc", method="POST").all()
     for a in data_form:
         if list(a[0].values()):
             value = list(a[0].values())[0]
@@ -168,30 +198,40 @@ def wordpress_xmlrpc_username_password_tries_top(x):
 
 def wordpress_xmlrpc_password_tries_count():
     counter = 0
-    data_form = db.session.query(models.Request.form).filter_by(endpoint='wp_xmlrpc', method='POST').all()
+    data_form = db.session.query(models.Request.form).filter_by(endpoint="wp_xmlrpc", method="POST").all()
     for a in data_form:
         if list(a[0].values()):
             value = list(a[0].values())[0]
-            if any(x in value for x in ['getUserBlogs', 'getUsersBlogs']):
+            if any(x in value for x in ["getUserBlogs", "getUsersBlogs"]):
                 counter = counter + 1
     return counter
 
 
 def wordpress_xmlrpc_password_tries_last_24h_count():
     counter = 0
-    data_form = db.session.query(models.Request.form).filter(
-        models.Request.timestamp > (datetime.utcnow() - timedelta(days=1)), models.Request.endpoint == 'wp_xmlrpc',
-        models.Request.method == 'POST').all()
+    data_form = (
+        db.session.query(models.Request.form)
+        .filter(
+            models.Request.timestamp > (datetime.utcnow() - timedelta(days=1)),
+            models.Request.endpoint == "wp_xmlrpc",
+            models.Request.method == "POST",
+        )
+        .all()
+    )
     for a in data_form:
         if list(a[0].values()):
             value = list(a[0].values())[0]
-            if any(x in value for x in ['getUserBlogs', 'getUsersBlogs']):
+            if any(x in value for x in ["getUserBlogs", "getUsersBlogs"]):
                 counter = counter + 1
     return counter
 
 
 def gather_ip_geo_whois(ip):
-    r = requests.get("http://ip-api.com/json/"+ip+"?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,reverse,mobile,proxy,query").json()
+    r = requests.get(
+        "http://ip-api.com/json/"
+        + ip
+        + "?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,reverse,mobile,proxy,query"
+    ).json()
     return r
 
 
@@ -208,14 +248,16 @@ def requests_all_days_chart(ip):
 """
 Drupal analysis
 """
+
+
 def drupal_username_password_tries_top(x):
     usernames = []
     passwords = []
-    data_form = db.session.query(models.Request.form).filter_by(endpoint='drupal8_login', method='POST').all()
+    data_form = db.session.query(models.Request.form).filter_by(endpoint="drupal8_login", method="POST").all()
     for a in data_form:
         try:
-            usernames.append(a[0]['name'])
-            passwords.append(a[0]['pass'])
+            usernames.append(a[0]["name"])
+            passwords.append(a[0]["pass"])
         except:
             continue
     usernames = Counter(usernames).most_common(x)
@@ -224,13 +266,19 @@ def drupal_username_password_tries_top(x):
 
 
 def drupal_password_tries_count():
-    data_counter = db.session.query(models.Request).filter_by(endpoint='drupal8_login', method='POST').count()
-    #data_counter = db.session.query(models.Request).filter(or_(models.Request.endpoint=='drupal_login', models.Request.endpoint=='drupal8_login'), models.Request.method=='POST').count()
+    data_counter = db.session.query(models.Request).filter_by(endpoint="drupal8_login", method="POST").count()
+    # data_counter = db.session.query(models.Request).filter(or_(models.Request.endpoint=='drupal_login', models.Request.endpoint=='drupal8_login'), models.Request.method=='POST').count()
     return data_counter
 
 
 def drupal_password_tries_last_24h_count():
-    data_counter = db.session.query(models.Request).filter(
-        models.Request.timestamp > (datetime.utcnow() - timedelta(days=1)), models.Request.endpoint == 'drupal8_login',
-        models.Request.method == 'POST').count()
+    data_counter = (
+        db.session.query(models.Request)
+        .filter(
+            models.Request.timestamp > (datetime.utcnow() - timedelta(days=1)),
+            models.Request.endpoint == "drupal8_login",
+            models.Request.method == "POST",
+        )
+        .count()
+    )
     return data_counter

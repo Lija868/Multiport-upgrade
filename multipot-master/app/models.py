@@ -20,14 +20,25 @@ class Request(db.Model):
         return "<Request %s>" % self.uuid
 
     def todict(self):
-        return {'id':self.id, 'uuid':self.uuid, 'form':self.form, 'headers':self.headers, 'args':self.args,
-                'url':self.url, 'data':self.data, 'files':self.files, 'remote_addr':self.remote_addr,
-                'method':self.method, 'endpoint':self.endpoint, 'timestamp':self.timestamp}
+        return {
+            "id": self.id,
+            "uuid": self.uuid,
+            "form": self.form,
+            "headers": self.headers,
+            "args": self.args,
+            "url": self.url,
+            "data": self.data,
+            "files": self.files,
+            "remote_addr": self.remote_addr,
+            "method": self.method,
+            "endpoint": self.endpoint,
+            "timestamp": self.timestamp,
+        }
 
 
 class Response(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    request_uuid = db.Column(db.String(36), db.ForeignKey('request.uuid'), index=True)
+    request_uuid = db.Column(db.String(36), db.ForeignKey("request.uuid"), index=True)
     status = db.Column(db.String(50))  # HTTP status
     status_code = db.Column(db.Integer)  # HTTP status code
     headers = db.Column(db.JSON)  # HTTP response headers
@@ -37,5 +48,10 @@ class Response(db.Model):
         return "<Response %s>" % self.request_id
 
     def todict(self):
-        return {'id':self.id, 'request_uuid':self.request_uuid, 'status':self.status, 'status_code':self.status_code,
-                'headers':self.headers}
+        return {
+            "id": self.id,
+            "request_uuid": self.request_uuid,
+            "status": self.status,
+            "status_code": self.status_code,
+            "headers": self.headers,
+        }
