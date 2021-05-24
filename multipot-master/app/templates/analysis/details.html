@@ -45,7 +45,7 @@
                                 <td style="">{{ elem.request.timestamp }}</td>
                                 <td style="overflow-wrap: break-word; word-wrap: break-word; -ms-word-break: break-all; word-break: break-all;">{{ elem.request.url }}</td>
                                 <td style="">{{ elem.request.method }}</td>
-                                <td style=""> <a href="{{ url_for('analysis_ip', token=ANALYSIS_TOKEN, ip=elem.request.remote_addr)}}" target="_blank"> {{ elem.request.remote_addr }}</a> </td>
+                                <td style=""> <a href="{{ url_for('analysis_ip', ip=elem.request.remote_addr)}}" target="_blank"> {{ elem.request.remote_addr }}</a> </td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -91,7 +91,7 @@
                         // send delete request and remove row from table
                         var b = this;
                         $.ajax({
-                            url: "/api/analysis/"+this.value+"?token={{ ANALYSIS_TOKEN }}",
+                            url: "/api/analysis/"+this.value,
                             type: "DELETE",
                             success: function(result) {
                                 table.row(b.closest('table').closest('tr').previousSibling).remove().draw(false);
@@ -126,7 +126,7 @@
                     //get data-uuid-sub attribute of the clicked element
                     var myuuid = $(e.relatedTarget).data('uuid-sub');
                     var textedJson;
-                    $.getJSON("/api/analysis/"+myuuid+"?token={{ ANALYSIS_TOKEN }}", function(data) {
+                    $.getJSON("/api/analysis/"+myuuid, function(data) {
                         // beautify and display data
                         textedJson = JSON.stringify(data, undefined, 4);
                         $(e.currentTarget).find('#showJsonPre').text(textedJson);

@@ -31,7 +31,7 @@
 	<!-- Headerbar  -->
 	<div class="headerbar">
         <div class="headerbar-left">
-			<a href="{{ url_for('analysis_index', token=ANALYSIS_TOKEN) }}" class="logo"><span>Multipot</span></a>
+			<a href="{{ url_for('analysis_index') }}" class="logo"><span>Multipot</span></a>
         </div>
         <nav class="headerbar-custom">
         </nav>
@@ -43,7 +43,7 @@
         <div id="sidebar-menu">        
             <ul>
                 <li class="submenu">
-                    {{ nav_link('analysis_index', ANALYSIS_TOKEN, 'Web') }}
+                    {{ nav_link('analysis_index','', 'Web') }}
                 </li>
 <!--                <li class="submenu subsubmenu">-->
 <!--                    {{ nav_link('analysis_wordpress', ANALYSIS_TOKEN, 'WordPress') }}-->
@@ -52,10 +52,10 @@
 <!--                    {{ nav_link('analysis_drupal', ANALYSIS_TOKEN, 'Drupal') }}-->
 <!--                </li>-->
                 <li class="submenu">
-                    {{ nav_link('analysis_ip', ANALYSIS_TOKEN, 'IP address details') }}
+                    {{ nav_link('analysis_ip', '', 'IP address details') }}
                 </li>
                 <li class="submenu">
-                    {{ nav_link('analysis_details', ANALYSIS_TOKEN, 'All request details') }}
+                    {{ nav_link('analysis_details', '',  'All request details') }}
                 </li>
             </ul>
         </div>

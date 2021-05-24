@@ -9,7 +9,7 @@ import ipaddress
 # Returns an excerpt of all stored request/response pairs
 # not used
 @app.route('/api/analysis/data')
-@token_required
+ 
 def api_analysis_data():
     # omits rows when response or request is missing
     data = {"data": [{'uuid': req.uuid,
@@ -22,7 +22,7 @@ def api_analysis_data():
 
 
 @app.route('/api/analysis/<uuid:uuid>', methods=['GET', 'DELETE'])
-@token_required
+ 
 def api_analysis_data_uuid(uuid):
     uuid = str(uuid)
     if request.method == 'GET':
@@ -47,7 +47,7 @@ def api_analysis_data_uuid(uuid):
 
 # not used
 @app.route('/api/analysis/ip/<ip>')
-@token_required
+ 
 def api_analysis_ip(ip):
     try:
         ipaddress.ip_address(ip)
@@ -61,7 +61,7 @@ def api_analysis_ip(ip):
 
 
 @app.route('/api/analysis/ip/geoinfo/<ip>')
-@token_required
+ 
 def api_geoinfo_ip(ip):
     try:
         ipaddress.ip_address(ip)
@@ -72,28 +72,27 @@ def api_geoinfo_ip(ip):
 
 
 @app.route('/api/analysis/chart/requests/days/<int:days>', methods=['GET'])
-@token_required
+ 
 def api_analysis_chart_requests_last_x_days(days):
     requests_chart_last_x_days_days, requests_chart_last_x_days_requests = requests_last_x_days_chart(days)
     return jsonify({'days': requests_chart_last_x_days_days, 'requests': requests_chart_last_x_days_requests})
 
 
 @app.route('/api/analysis/chart/requests/hours/<int:hours>', methods=['GET'])
-@token_required
+ 
 def api_analysis_chart_requests_last_x_hours(hours):
     requests_chart_last_x_days_hours, requests_chart_last_x_hours_requests = requests_last_x_hours_chart(hours)
     return jsonify({'hours': requests_chart_last_x_days_hours, 'requests': requests_chart_last_x_hours_requests})
 
 
 @app.route('/api/analysis/table/top-ips/<int:top>/days/<int:days>', methods=['GET'])
-@token_required
+ 
 def api_analysis_table_ip_addresses_top(top, days):
     data_top_ip = ip_addresses_top(top, days)
     return jsonify(data_top_ip)
 
 
 @app.route('/analysis/index')
-@token_required
 def analysis_index():
     # row 1
     data_stored_requests_count = stored_requests_count()
@@ -119,7 +118,7 @@ def analysis_index():
 
 
 @app.route('/analysis/details')
-@token_required
+ 
 def analysis_details():
     data = [{'uuid': req.uuid,
              'request': {'id': req.id, 'url': req.url, 'timestamp': req.timestamp, 'method': req.method,
@@ -129,7 +128,7 @@ def analysis_details():
 
 
 @app.route('/analysis/wordpress')
-@token_required
+ 
 def analysis_wordpress():
     # general
     data_wordpress_wp_login_password_tries_count = wordpress_wp_login_password_tries_count()
@@ -163,7 +162,7 @@ def analysis_wordpress():
 
 
 @app.route('/analysis/ip')
-@token_required
+ 
 def analysis_ip():
     ip = request.args.get('ip')
     try:
@@ -171,7 +170,7 @@ def analysis_ip():
             raise ValueError("No IP received.")
         ipaddress.ip_address(ip)
     except ValueError:
-        return render_template('analysis/ip.html', ANALYSIS_TOKEN=Config.ANALYSIS_TOKEN, IP="")
+        return render_template('analysis/ip.html', IP="")
     data_table = [{'uuid': req.uuid,
                   'request': {'id': req.id, 'url': req.url, 'timestamp': req.timestamp, 'method': req.method,
                               'remote_addr': req.remote_addr}}
@@ -182,7 +181,7 @@ def analysis_ip():
 
 
 @app.route('/analysis/drupal')
-@token_required
+ 
 def analysis_drupal():
     # row 1
     data_drupal_password_tries_count = drupal_password_tries_count()
