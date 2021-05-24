@@ -121,45 +121,13 @@ def analysis_index():
 @app.route('/analysis/details')
 @token_required
 def analysis_details():
+    # query = models.Request.query.all().order_by(desc( models.Request.id))
     data = [{'uuid': req.uuid,
              'request': {'id': req.id, 'url': req.url, 'timestamp': req.timestamp, 'method': req.method,
                          'remote_addr': req.remote_addr}}
             for req in models.Request.query.all()]
     return render_template('analysis/details.html', table_content=data, ANALYSIS_TOKEN=Config.ANALYSIS_TOKEN)
 
-
-@app.route('/analysis/wordpress')
-@token_required
-def analysis_wordpress():
-    # general
-    data_wordpress_wp_login_password_tries_count = wordpress_wp_login_password_tries_count()
-    data_wordpress_xmlrpc_password_tries_count = wordpress_xmlrpc_password_tries_count()
-    data_wordpress_wp_login_password_tries_last_24h_count = wordpress_wp_login_password_tries_last_24h_count()
-    data_wordpress_xmlrpc_password_tries_last_24h_count = wordpress_xmlrpc_password_tries_last_24h_count()
-    # row 1
-    data_wp_password_tries_count = data_wordpress_wp_login_password_tries_count + data_wordpress_xmlrpc_password_tries_count
-    data_wp_password_tries_last_24h_count = data_wordpress_wp_login_password_tries_last_24h_count + data_wordpress_xmlrpc_password_tries_last_24h_count
-    #data_wordpress_wp_login_password_tries_count
-    #data_wordpress_wp_login_password_tries_last_24h_count
-    #data_wordpress_xmlrpc_password_tries_count
-    #data_wordpress_xmlrpc_password_tries_last_24h_count
-    data_distinct_passwords_tried = len(wordpress_wp_login_usernames_password_tries_top(None)[1] + wordpress_xmlrpc_username_password_tries_top(None)[1])
-    # row 2
-    data_wp_login_usernames_top, data_wp_login_passwords_top = wordpress_wp_login_usernames_password_tries_top(10)
-    data_wp_xmlrpc_usernames_top, data_wp_xmlrpc_passwords_top = wordpress_xmlrpc_username_password_tries_top(10)
-    return render_template('analysis/wordpress.html', ANALYSIS_TOKEN=Config.ANALYSIS_TOKEN,
-                           data_wp_password_tries_count=data_wp_password_tries_count,
-                           data_wp_password_tries_last_24h_count=data_wp_password_tries_last_24h_count,
-                           data_wordpress_wp_login_password_tries_count=data_wordpress_wp_login_password_tries_count,
-                           data_wordpress_wp_login_password_tries_last_24h_count=data_wordpress_wp_login_password_tries_last_24h_count,
-                           data_wordpress_xmlrpc_password_tries_count=data_wordpress_xmlrpc_password_tries_count,
-                           data_wordpress_xmlrpc_password_tries_last_24h_count=data_wordpress_xmlrpc_password_tries_last_24h_count,
-                           data_distinct_passwords_tried=data_distinct_passwords_tried,
-                           data_wp_login_usernames_top=data_wp_login_usernames_top,
-                           data_wp_login_passwords_top=data_wp_login_passwords_top,
-                           data_wp_xmlrpc_usernames_top=data_wp_xmlrpc_usernames_top,
-                           data_wp_xmlrpc_passwords_top=data_wp_xmlrpc_passwords_top
-                           )
 
 
 @app.route('/analysis/ip')
@@ -181,19 +149,3 @@ def analysis_ip():
     return render_template('analysis/ip.html', ANALYSIS_TOKEN=Config.ANALYSIS_TOKEN, table_content=data_table, IP=ip, geo_whois=geo_whois, bar_days=bar_days, bar_requests=bar_requests)
 
 
-@app.route('/analysis/drupal')
-@token_required
-def analysis_drupal():
-    # row 1
-    data_drupal_password_tries_count = drupal_password_tries_count()
-    data_drupal_password_tries_last_24h_count = drupal_password_tries_last_24h_count()
-    data_distinct_passwords_tried = len(drupal_username_password_tries_top(None)[1])
-    # row 2
-    data_drupal_login_usernames_top, data_drupal_login_passwords_top = drupal_username_password_tries_top(10)
-    return render_template('analysis/drupal.html', ANALYSIS_TOKEN=Config.ANALYSIS_TOKEN,
-                           data_drupal_password_tries_count=data_drupal_password_tries_count,
-                           data_drupal_password_tries_last_24h_count=data_drupal_password_tries_last_24h_count,
-                           data_distinct_passwords_tried=data_distinct_passwords_tried,
-                           data_drupal_login_usernames_top=data_drupal_login_usernames_top,
-                           data_drupal_login_passwords_top=data_drupal_login_passwords_top
-                           )

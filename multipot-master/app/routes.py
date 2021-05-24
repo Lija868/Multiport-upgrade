@@ -10,35 +10,10 @@ from app.helpers import save_request, save_response
 # Drupal 7
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    # check if "?q=user" for Drupal 6/7 login (currently uses Drupal 8 login page; works because login form parameter are the same in Drupal 6,7,8)
-    # TODO: find a way to implement this outside of the index route
-    #if request.args['q'] == 'user':
-    #    return send_from_directory('static/fake-sites/drupal/', 'login_drupal8.html')
-    return send_from_directory('static/fake-sites/drupal/', 'index_drupal7.html')
+    return send_from_directory('static/fake-sites/web/', 'index.html')
 
 
-# Drupal user login
-@app.route('/user/login', methods=['GET', 'POST'])
-def drupal8_login():
-    return send_from_directory('static/fake-sites/drupal/', 'login_drupal8.html')
 
-
-# Wordpress admin login
-@app.route('/wp-admin', methods=['GET', 'POST'])
-@app.route('/wp-admin/', methods=['GET', 'POST'])
-@app.route('/wp-login.php', methods=['GET', 'POST'])
-def wp_login():
-    return send_from_directory('static/fake-sites/wordpress/wp-login/', 'wp-login.html')
-
-# Wordpress xmlrpc login
-@app.route('/xmlrpc.php', methods=['GET', 'POST'])
-def wp_xmlrpc():
-    return send_from_directory('static/fake-sites/wordpress/xmlrpc/', 'xmlrpc_faultCode_403.xml')
-
-# Drupal changelog file
-@app.route('/CHANGELOG.txt', methods=['GET', 'POST'])
-def changelog():
-    return send_from_directory('static/fake-sites/drupal/changelogs/', 'CHANGELOG-7.55.txt')
 
 # Owncloud status page
 @app.route('/stat')
@@ -53,11 +28,7 @@ def status():
 @app.route('/', defaults={'path': ''}, methods=['GET', 'POST'])
 @app.route('/<path:anypath>', methods=['GET', 'POST'])
 def catch_all(anypath):
-    return send_from_directory('static/fake-sites/drupal/', 'index_drupal7.html')
-
-
-### --- app objects; used for logging requests and responses made to the server --- ###
-### --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ###
+    return send_from_directory('static/fake-sites/web/', 'index.html')
 
 
 @app.before_request
