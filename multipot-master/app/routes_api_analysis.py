@@ -121,11 +121,11 @@ def analysis_index():
 @app.route('/analysis/details')
 @token_required
 def analysis_details():
-    # query = models.Request.query.all().order_by(desc( models.Request.id))
+    query = models.Request.query.order_by(desc(models.Request.id)).all()
     data = [{'uuid': req.uuid,
              'request': {'id': req.id, 'url': req.url, 'timestamp': req.timestamp, 'method': req.method,
                          'remote_addr': req.remote_addr}}
-            for req in models.Request.query.all()]
+            for req in query]
     return render_template('analysis/details.html', table_content=data, ANALYSIS_TOKEN=Config.ANALYSIS_TOKEN)
 
 
