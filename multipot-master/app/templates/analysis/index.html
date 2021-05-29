@@ -231,33 +231,6 @@
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
                 <div class="card mb-3">
                     <div class="card-header">
-                        <h5>Accessed endpoints</h5>
-                        All time - Top 10
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-responsive-xl table-hover">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Endpoint</th>
-                                    <th scope="col"># of requests</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for elem in data_endpoints_top %}
-                                    <tr>
-                                        <td>{{ elem[0][0] }}</td>
-                                        <td>{{ elem[1] }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div><!-- end card-->
-            </div>
-
-            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
-                <div class="card mb-3">
-                    <div class="card-header">
                         <h5>IP addresses</h5>
                             <select id="daysIpAddr" class="form-control inl">
                                 <option value="0">All time</option>
