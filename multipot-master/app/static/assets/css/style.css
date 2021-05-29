@@ -31,7 +31,7 @@ a {
   z-index: 999; }
 .headerbar .headerbar-left {
   /*background: #4980b5;*/
-  background: #00796B;
+  background: #0f7e90;
   float: left;
   text-align: center;
   height: 50px;
@@ -41,7 +41,7 @@ a {
   z-index: 1; }
 .headerbar-custom {
   /*background-color: #4980b5;*/
-  background-color: #00796B;
+  background-color: #0f7e90;
   border-radius: 0;
   margin-bottom: 0;
   padding: 0 10px;
@@ -106,7 +106,7 @@ a {
   background-color: #414d58;
   text-decoration: none; 
   /*border-left: 2px solid #608ab3; }*/
-  border-left: 2px solid #009688; }
+  border-left: 2px solid #17a2b8; }
 
 #sidebar-menu > ul > li > a > span {
   vertical-align: middle; }
@@ -114,7 +114,7 @@ a {
 #sidebar-menu > ul > li > a.active {
   color: #ffffff !important;
   /*background-color: #6194c1; }*/
-  background-color: #009688; }
+  background-color: #17a2b8; }
 
 #sidebar-menu > ul > li.subsubmenu > a > span {
   padding-left: 20px;
