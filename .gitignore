@@ -1,3 +1,3 @@
 multipot-master/.idea/
 *.pyc
-app.db
+multipot-master/app.db
